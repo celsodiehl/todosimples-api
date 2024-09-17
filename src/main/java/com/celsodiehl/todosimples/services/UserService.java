@@ -8,7 +8,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.celsodiehl.todosimples.repositories.UserRepository;
 import com.celsodiehl.todosimples.models.User;
-import com.celsodiehl.todosimples.repositories.TaskRepository;
 
 @Service
 public class UserService {
@@ -16,9 +15,6 @@ public class UserService {
     // CONSTRUTOR do Service
     @Autowired
     private UserRepository uRepository;
-
-    @Autowired
-    private TaskRepository tRepository;
 
     public User findById(Long id) {
         Optional<User> user = this.uRepository.findById(id);
@@ -29,7 +25,6 @@ public class UserService {
     @Transactional
     public User create(User obj) {
         obj.setId(null);
-        this.tRepository.saveAll(obj.getTasks());
         return obj;
     }
 
