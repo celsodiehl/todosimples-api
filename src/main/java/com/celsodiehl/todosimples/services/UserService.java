@@ -12,7 +12,7 @@ import com.celsodiehl.todosimples.models.User;
 @Service
 public class UserService {
 
-    // CONSTRUTOR do Service
+    // CONSTRUTOR do Service, injeção de dependência
     @Autowired
     private UserRepository uRepository;
 
@@ -25,6 +25,7 @@ public class UserService {
     @Transactional
     public User create(User obj) {
         obj.setId(null);
+        obj = this.uRepository.save(obj);
         return obj;
     }
 

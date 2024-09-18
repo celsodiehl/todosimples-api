@@ -15,6 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = User.TABLE_NAME)
 public class User {
@@ -81,6 +83,7 @@ public class User {
     }
 
 
+    @JsonIgnore
     public List<Task> getTasks() {
         return this.tasks;
     }
