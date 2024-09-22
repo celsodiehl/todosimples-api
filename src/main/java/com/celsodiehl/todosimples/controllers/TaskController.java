@@ -24,6 +24,7 @@ import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/task")
+@Validated
 public class TaskController {
     
     @Autowired
@@ -60,7 +61,7 @@ public class TaskController {
         return ResponseEntity.noContent().build();
     }
 
-    @GetMapping("/user/{userId}")
+    @GetMapping(value = "/user/{userId}")
     public ResponseEntity<List<Task>> findAllByUserId(@PathVariable Long userId){
         this.usService.findById(userId);
         List<Task> objs = this.tsService.findAllByUserId(userId);
