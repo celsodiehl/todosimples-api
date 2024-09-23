@@ -10,6 +10,8 @@ import org.springframework.transaction.annotation.Transactional;
 import com.celsodiehl.todosimples.models.Task;
 import com.celsodiehl.todosimples.models.User;
 import com.celsodiehl.todosimples.repositories.TaskRepository;
+import com.celsodiehl.todosimples.services.exceptions.DataBindingViolationException;
+import com.celsodiehl.todosimples.services.exceptions.ObjectNotFoundException;
 
 @Service
 public class TaskService {
@@ -22,7 +24,7 @@ public class TaskService {
 
     public Task findById(Long id){
         Optional<Task> tk = this.tRepository.findById(id);
-        return tk.orElseThrow(() -> new RuntimeException(
+        return tk.orElseThrow(() -> new ObjectNotFoundException(
                 "Tarefa não encontrada! Id: " + id + ", Tipo: " + Task.class.getName()));
     }
 
@@ -51,7 +53,7 @@ public class TaskService {
         try {
             this.tRepository.deleteById(id);
         } catch (Exception e) {
-            throw new RuntimeException("Não é Possível excluir, possui Relacionamentos!");
+            throw new DataBindingViolationException("Não é Possível excluir, possui Relacionamentos!");
         }
     }
     
