@@ -14,7 +14,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import jakarta.el.ELException;
+
 
 @Configuration
 @EnableWebSecurity
@@ -25,16 +25,17 @@ public class SecurityConfig {
 
     private static final String[] PUBLIC_MATCHERS_POST = { "/user", "/login" };
 
+    //MUDEI ACHADO DA INTERNET
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws ELException {
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.cors().and().csrf().disable();
-        http.authorizeRequests()
-                .antMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
-                .antMatchers(PUBLIC_MATCHERS).permitAll()
-                .anyRequest().authenticated();
-        http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
-
+        http.csrf(csrf -> csrf.disable())
+                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(req -> {
+                    req.requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll();
+                    req.requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS).permitAll();
+                    req.anyRequest().authenticated();
+                });
         return http.build();
 
     }
