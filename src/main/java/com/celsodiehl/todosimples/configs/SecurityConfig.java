@@ -16,6 +16,7 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 
 
+@SuppressWarnings("deprecation")
 @Configuration
 @EnableWebSecurity
 @EnableGlobalMethodSecurity(prePostEnabled = true)
@@ -29,11 +30,13 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-        http.csrf(csrf -> csrf.disable())
+        http
+        .csrf(csrf -> csrf.disable())
                 .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(req -> {
                     req.requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll();
                     req.requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS).permitAll();
+                   // req.requestMatchers(HttpMethod.OPTIONS, "**").permitAll();//allow CORS option calls
                     req.anyRequest().authenticated();
                 });
         return http.build();
