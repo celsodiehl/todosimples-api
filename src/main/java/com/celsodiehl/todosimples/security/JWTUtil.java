@@ -14,10 +14,10 @@ import io.jsonwebtoken.security.Keys;
 @Component
 public class JWTUtil {
 
-    @Value("$(jwt.secret)")
+    @Value("${jwt.secret}")
     private String secret;
 
-    @Value("$(jwt.expiration)")
+    @Value("${jwt.expiration}")
     private Long expiration;
 
     private SecretKey getKeyBySecret() {
@@ -25,6 +25,8 @@ public class JWTUtil {
         return key;
     }
 
+    //COLOQUEI POR ESTA OBSOLETA
+    @SuppressWarnings("deprecation")
     public String generateToken(String username) {
         SecretKey key = getKeyBySecret();
         return Jwts.builder()

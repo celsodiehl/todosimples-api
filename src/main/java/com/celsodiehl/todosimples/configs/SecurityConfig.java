@@ -19,6 +19,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import com.celsodiehl.todosimples.security.JWTAuthenticationFilter;
 import com.celsodiehl.todosimples.security.JWTUtil;
 
 @SuppressWarnings("deprecation")
@@ -32,42 +33,34 @@ public class SecurityConfig {
     @Autowired
     private UserDetailsService userDetailsService;
 
+    @Autowired
     private JWTUtil jwtUtil;
 
     private static final String[] PUBLIC_MATCHERS = { "/" };
 
     private static final String[] PUBLIC_MATCHERS_POST = { "/user", "/login" };
 
-    // MUDEI ACHADO DA INTERNET
+    // MUDEI ACHADO DA INTERNET mudar p Lambda e @SuppressWarnings("deprecation")
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http.cors(cors -> cors.disable());
+        http.csrf(csrf -> csrf.disable());
 
-        http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(sm -> sm.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeHttpRequests(req -> {
-                    req.requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll();
-                    req.requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS).permitAll();
-                    // req.requestMatchers(HttpMethod.OPTIONS, "**").permitAll();//allow CORS option
-                    // calls
-                    req.anyRequest().authenticated();
+        AuthenticationManagerBuilder authenticationManagerBuilder = http
+                .getSharedObject(AuthenticationManagerBuilder.class);
+        authenticationManagerBuilder.userDetailsService(this.userDetailsService)
+                .passwordEncoder(bCryptPasswordEncoder());
 
-                    AuthenticationManagerBuilder authenticationManagerBuilder = http
-                            .getSharedObject(AuthenticationManagerBuilder.class);
-                    try {
-                        authenticationManagerBuilder.userDetailsService(this.userDetailsService)
-                                .passwordEncoder(bCryptPasswordEncoder());
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        this.authenticationManager = authenticationManagerBuilder.build();
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                });
+        this.authenticationManager = authenticationManagerBuilder.build();
+        http.authorizeRequests(requests -> requests
+                .requestMatchers(HttpMethod.POST, PUBLIC_MATCHERS_POST).permitAll()
+                .requestMatchers(PUBLIC_MATCHERS).permitAll()
+                .anyRequest().authenticated().and()
+                .authenticationManager(authenticationManager));
+
+        http.addFilter(new JWTAuthenticationFilter(this.authenticationManager, this.jwtUtil));
+        http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
-
     }
 
     @Bean
