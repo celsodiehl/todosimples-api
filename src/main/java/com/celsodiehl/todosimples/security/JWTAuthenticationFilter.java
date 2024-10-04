@@ -1,5 +1,6 @@
 package com.celsodiehl.todosimples.security;
 
+import java.io.IOException;
 import java.util.ArrayList;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -12,7 +13,6 @@ import com.celsodiehl.todosimples.exceptions.GlobalExceptionHandler;
 import com.celsodiehl.todosimples.models.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import io.jsonwebtoken.io.IOException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -42,7 +42,7 @@ public class JWTAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
             Authentication authentication = this.authenticationManager.authenticate(authToken);
             return authentication;
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException();
         }
     }

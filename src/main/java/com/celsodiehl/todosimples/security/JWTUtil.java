@@ -25,7 +25,7 @@ public class JWTUtil {
         return key;
     }
 
-    //COLOQUEI POR ESTA OBSOLETA
+    //COLOQUEI POR ESTA OBSOLETA Depreciation
     @SuppressWarnings("deprecation")
     public String generateToken(String username) {
         SecretKey key = getKeyBySecret();
@@ -49,6 +49,14 @@ public class JWTUtil {
         return false;
     }
 
+    public String getUsername(String token) {
+        Claims claims = getClaims(token);
+        if (Objects.nonNull(claims))
+            return claims.getSubject();
+        return null;
+    }
+
+    @SuppressWarnings("deprecation")
     private Claims getClaims(String token) {
         SecretKey key = getKeyBySecret();
         try {
