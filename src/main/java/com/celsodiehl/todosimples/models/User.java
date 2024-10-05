@@ -10,15 +10,11 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
-import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -32,46 +28,37 @@ import com.fasterxml.jackson.annotation.JsonProperty.Access;
 @Table(name = User.TABLE_NAME)
 @AllArgsConstructor
 @NoArgsConstructor
-@Setter
-@Getter
-@EqualsAndHashCode
+@Data
 public class User {
-    public interface CreateUser {
-    }
-
-    public interface UpdateUser {
-    }
 
     public static final String TABLE_NAME = "User";
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id", unique = true)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @Column(name = "username", length = 100, nullable = false, unique = true)
-    @NotNull(groups = CreateUser.class)
-    @NotEmpty(groups = CreateUser.class)
-    @Size(groups = CreateUser.class, min = 2, max = 100)
+    @Size(min = 2, max = 100)
+    @NotBlank
     private String username;
 
+    @Column(name = "password", length = 60, nullable = false)
     // não retorna a senha pro usuário
     @JsonProperty(access = Access.WRITE_ONLY)
-    @Column(name = "password", length = 60, nullable = false)
-    @NotNull(groups = { CreateUser.class, UpdateUser.class })
-    @NotEmpty(groups = { CreateUser.class, UpdateUser.class })
-    @Size(groups = CreateUser.class, min = 8, max = 60)
+    @Size(min = 8, max = 60)
+    @NotBlank
     private String password;
 
     @OneToMany(mappedBy = "user")
     @JsonProperty(access = Access.WRITE_ONLY)
     private List<Task> tasks = new ArrayList<Task>();
 
+    @Column(name = "profile", nullable = false)
     // Sempre busca o perfil quando buscar o Usuário com EAGER
     @ElementCollection(fetch = FetchType.EAGER)
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     @CollectionTable(name = "user_profile")
-    @Column(name = "profile", nullable = false)
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Set<Integer> profiles = new HashSet<>();
 
     public Set<ProfileEnum> getProfiles() {

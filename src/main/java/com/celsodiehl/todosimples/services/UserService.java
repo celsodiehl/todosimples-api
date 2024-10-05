@@ -17,8 +17,12 @@ import com.celsodiehl.todosimples.services.exceptions.AuthorizationException;
 import com.celsodiehl.todosimples.services.exceptions.DataBindingViolationException;
 import com.celsodiehl.todosimples.services.exceptions.ObjectNotFoundException;
 
+import jakarta.validation.Valid;
+
 import com.celsodiehl.todosimples.models.ProfileEnum;
 import com.celsodiehl.todosimples.models.User;
+import com.celsodiehl.todosimples.models.dto.UserCreateDTO;
+import com.celsodiehl.todosimples.models.dto.UserUpdateDTO;
 
 @Service
 public class UserService {
@@ -32,7 +36,8 @@ public class UserService {
 
     public User findById(Long id) {
         UserSpringSecurity userSpringSecurity = authenticated();
-        if (!Objects.nonNull(userSpringSecurity) || !userSpringSecurity.hasRole(ProfileEnum.ADMIN) && !id.equals(userSpringSecurity.getId()))
+        if (!Objects.nonNull(userSpringSecurity)
+                || !userSpringSecurity.hasRole(ProfileEnum.ADMIN) && !id.equals(userSpringSecurity.getId()))
             throw new AuthorizationException("Acesso Negado!");
 
         Optional<User> user = this.uRepository.findById(id);
@@ -72,6 +77,20 @@ public class UserService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public User fromDTO(@Valid UserCreateDTO obj) {
+        User user = new User();
+        user.setUsername(obj.getUsername());
+        user.setPassword(obj.getPassword());
+        return user;
+    }
+
+    public User fromDTO(@Valid UserUpdateDTO obj) {
+        User user = new User();
+        user.setId(obj.getId());
+        user.setPassword(obj.getPassword());
+        return user;
     }
 
 }
